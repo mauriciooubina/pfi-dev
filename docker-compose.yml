@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: pfi-postgres
+    environment:
+      POSTGRES_DB: pfi_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: pfi_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+      - HELLFISH_SALT=HF_2026_SALT
+      - HOOLIGANS_SALT=HL_2026_SALT
+      - DATA_SOURCE=POSTGRES
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=pfi_db
+      - DB_USER=postgres
+      - DB_PASS=postgres
+    depends_on:
+      - postgres
+    restart: always
+
+volumes:
+  pgdata:
+

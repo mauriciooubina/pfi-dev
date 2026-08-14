@@ -1,0 +1,6 @@
+id,name,description,price,image,duration
+1,Corte,Corte tradicional / degradé con tijera y/o máquina,22000,https://dxujbqkjwkekkcinjwrr.supabase.co/storage/v1/object/public/services/corte.jpeg,30
+2,Afeitado a vapor,Recorte y perfilado de barba con máquina (y navaja opcional),15000,https://dxujbqkjwkekkcinjwrr.supabase.co/storage/v1/object/public/services/vapor.jpeg,30
+3,Corte + Arreglo de Barba,Corte de Pelo + Arreglo de Barba + (Afeitado a vapor opcional),27000,https://dxujbqkjwkekkcinjwrr.supabase.co/storage/v1/object/public/services/corte_barba.jpeg,60
+4,Perfilado de cejas,Perfilado de cejas (selvicio gratuito),0,https://dxujbqkjwkekkcinjwrr.supabase.co/storage/v1/object/public/services/ceja.png,30
+5,Corte para niños,Corte para niños,22000,https://dxujbqkjwkekkcinjwrr.supabase.co/storage/v1/object/public/services/ninos.png,30
