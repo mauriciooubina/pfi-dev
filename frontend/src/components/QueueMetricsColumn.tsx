@@ -1,6 +1,7 @@
 import React from 'react';
 import { TrendingUp, Users, CheckCircle } from 'lucide-react';
 import type { ShopQueueData } from '@/types';
+import { formatNumber, formatPercent } from '@/utils';
 
 interface QueueMetricsColumnProps {
   queueMetrics: ShopQueueData | null;
@@ -19,11 +20,6 @@ export const QueueMetricsColumn: React.FC<QueueMetricsColumnProps> = ({ queueMet
   }
 
   const { lambda_rate, mu_rate, servers, metrics } = queueMetrics;
-  
-  // Provider capacity text
-  const providerDetails = shopId === 'hellfish' 
-    ? '3 activos (Facundo, Martín, Mauro) • 2 inactivos excluidos (Alan, Mauro 5)' 
-    : '2 activos (Sebastián Fraga, Valentino) • 1 inactivo excluido (Valen)';
 
   return (
     <div className="view-grid-queues fade-in">
@@ -33,7 +29,7 @@ export const QueueMetricsColumn: React.FC<QueueMetricsColumnProps> = ({ queueMet
         <div>
           <h2 style={{ fontFamily: 'Outfit', fontSize: '1.4rem', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <TrendingUp size={22} style={{ color: '#a5b4fc' }} />
-            Modelo Analítico de Colas M/M/s ({shopId.toUpperCase()})
+            Modelo Analítico de Colas M/M/s
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '4px' }}>
             Análisis estocástico en estado estable sobre la ventana operativa real (10:00 a 20:00 hs)
@@ -53,7 +49,7 @@ export const QueueMetricsColumn: React.FC<QueueMetricsColumnProps> = ({ queueMet
           <div>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Capacidad de Servidores en Paralelo (s)</div>
             <div style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-              {servers} prestadores activos <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 'normal' }}>({providerDetails})</span>
+              {servers} prestadores activos
             </div>
           </div>
         </div>
@@ -72,7 +68,7 @@ export const QueueMetricsColumn: React.FC<QueueMetricsColumnProps> = ({ queueMet
             color: metrics.utilization > 0.8 ? 'var(--danger)' : 
                    metrics.utilization > 0.5 ? 'var(--warning)' : 'var(--success)'
           }}>
-            {(metrics.utilization * 100).toFixed(1)}%
+            {formatPercent(metrics.utilization, 1)}
           </div>
           <div className="utilization-bar-container" style={{ margin: '4px 0 8px 0' }}>
             <div 
@@ -85,7 +81,7 @@ export const QueueMetricsColumn: React.FC<QueueMetricsColumnProps> = ({ queueMet
             />
           </div>
           <div className="parameter-explanation">
-            Muestra la intensidad del tráfico en el local. Un valor del {(metrics.utilization * 100).toFixed(1)}% indica que los prestadores están ocupados un tercio de su tiempo operativo, manteniendo margen seguro para absorber la demanda aleatoria.
+            Muestra la intensidad del tráfico en el local. Un valor del {formatPercent(metrics.utilization, 1)} indica que los prestadores están ocupados un tercio de su tiempo operativo, manteniendo margen seguro para absorber la demanda aleatoria.
           </div>
         </div>
 
@@ -96,7 +92,7 @@ export const QueueMetricsColumn: React.FC<QueueMetricsColumnProps> = ({ queueMet
             <span className="parameter-symbol">λ (Llegadas / Hora)</span>
           </div>
           <div className="parameter-value">
-            {lambda_rate.toFixed(3)} <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>clientes/hora</span>
+            {formatNumber(lambda_rate, 3)} <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>clientes/hora</span>
           </div>
           <div className="parameter-explanation">
             Frecuencia promedio de llegada de clientes legítimos durante las 10 horas de atención diaria (10:00 a 20:00 hs), habiendo descontado bloqueos de agenda y cancelaciones tempranas.
@@ -110,10 +106,10 @@ export const QueueMetricsColumn: React.FC<QueueMetricsColumnProps> = ({ queueMet
             <span className="parameter-symbol">μ (Servicios / Hora)</span>
           </div>
           <div className="parameter-value">
-            {mu_rate.toFixed(3)} <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>servicios/hora</span>
+            {formatNumber(mu_rate, 3)} <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>servicios/hora</span>
           </div>
           <div className="parameter-explanation">
-            Capacidad de servicio de cada prestador individual por hora. Se calcula de forma ponderada según la duración real de los servicios en el catálogo histórico (promedio: {(60 / mu_rate).toFixed(1)} minutos por turno).
+            Capacidad de servicio de cada prestador individual por hora. Se calcula de forma ponderada según la duración real de los servicios en el catálogo histórico (promedio: {formatNumber(60 / mu_rate, 1)} minutos por turno).
           </div>
         </div>
 
@@ -124,7 +120,7 @@ export const QueueMetricsColumn: React.FC<QueueMetricsColumnProps> = ({ queueMet
             <span className="parameter-symbol">Wq (Minutos)</span>
           </div>
           <div className="parameter-value" style={{ color: '#38bdf8' }}>
-            {metrics.Wq_minutes.toFixed(2)} <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>minutos</span>
+            {formatNumber(metrics.Wq_minutes, 2)} <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>minutos</span>
           </div>
           <div className="parameter-explanation">
             Tiempo promedio que aguarda un cliente en la sala de espera antes de ser atendido. Valores inferiores a 5 minutos reflejan una experiencia de cliente óptima sin demoras acumuladas.
@@ -138,7 +134,7 @@ export const QueueMetricsColumn: React.FC<QueueMetricsColumnProps> = ({ queueMet
             <span className="parameter-symbol">Lq (Personas)</span>
           </div>
           <div className="parameter-value" style={{ color: '#a5b4fc' }}>
-            {metrics.Lq.toFixed(2)} <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>clientes</span>
+            {formatNumber(metrics.Lq, 2)} <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>clientes</span>
           </div>
           <div className="parameter-explanation">
             Cantidad esperada de personas haciendo cola en un instante arbitrario de la jornada. Representa la congestión física dentro de la sala de espera del comercio.
@@ -152,7 +148,7 @@ export const QueueMetricsColumn: React.FC<QueueMetricsColumnProps> = ({ queueMet
             <span className="parameter-symbol">P₀ (Porcentaje)</span>
           </div>
           <div className="parameter-value">
-            {(metrics.p0 * 100).toFixed(1)}%
+            {formatPercent(metrics.p0, 1)}
           </div>
           <div className="parameter-explanation">
             Porcentaje del tiempo operativo en el que todos los prestadores activos están libres y no hay clientes aguardando en la recepción del comercio.
@@ -166,10 +162,10 @@ export const QueueMetricsColumn: React.FC<QueueMetricsColumnProps> = ({ queueMet
         <CheckCircle size={24} style={{ color: 'var(--success)', flexShrink: 0 }} />
         <div style={{ flexGrow: 1 }}>
           <h4 style={{ color: 'var(--text-primary)', fontSize: '0.95rem', fontWeight: 600 }}>
-            Verificación Estocástica de Estabilidad: Sistema Estable (ρ &lt; 1.0)
+            Verificación Estocástica de Estabilidad: Sistema Estable (ρ &lt; 1,0)
           </h4>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '2px' }}>
-            Dado que el factor de ocupación ρ ({(metrics.utilization * 100).toFixed(1)}%) es strictly menor al 100%, el sistema de {shopId} no genera colas infinitas ni colapso operativo.
+            Dado que el factor de ocupación ρ ({formatPercent(metrics.utilization, 1)}) es menor al 100%, el sistema de {shopId} no genera colas infinitas ni colapso operativo.
           </p>
         </div>
       </div>

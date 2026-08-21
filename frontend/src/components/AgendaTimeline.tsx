@@ -45,7 +45,7 @@ export const AgendaTimeline: React.FC<AgendaTimelineProps> = ({
         <div className="column-title" style={{ justifyContent: 'center', position: 'relative' }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <CalendarIcon size={20} />
-            Agenda Diaria
+            Agenda diaria
           </span>
           <span style={{ position: 'absolute', right: 0, fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>
             Total: {appointments.length} turnos

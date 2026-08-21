@@ -160,7 +160,7 @@
   border-color: rgba(99, 102, 241, 0.3);
 }
 
-/* View Layout 1: Agenda & Alerts (2 columns with symmetrical height & scroll) */
+/* View Layout 1: Agenda diaria (2 columns with symmetrical height & scroll) */
 .view-grid-agenda {
   display: grid;
   grid-template-columns: 1.6fr 1fr;

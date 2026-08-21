@@ -29,7 +29,7 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="header-title-area">
         <h1>SISTEMA DE PREDICCIÓN DE AUSENTISMO</h1>
         <p>
-          PFI UADE 2026 — Agenda Híbrida y Modelado Estocástico M/M/s
+          Proyecto Final de Ingeniería - UADE 2026
           {isFallbackMode && (
             <span style={{ 
               marginLeft: '12px', 
@@ -43,7 +43,7 @@ export const Header: React.FC<HeaderProps> = ({
               alignItems: 'center',
               gap: '4px'
             }}>
-              <AlertCircle size={12} /> MODALIDAD LOCAL DEMO
+              <AlertCircle size={12} /> MODO FALLBACK
             </span>
           )}
         </p>
@@ -54,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({
         
         {/* Step 1: Shop Selection */}
         <div className="selector-step">
-          <span className="step-label">Seleccioná el Local:</span>
+          <span className="step-label">Local:</span>
           <div className="shop-selector">
             <button 
               className={`shop-btn ${shopId === 'hellfish' ? 'active' : ''}`}
@@ -73,7 +73,7 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Step 2: Date Selection & Refresh */}
         <div className="selector-step">
-          <span className="step-label">Seleccioná la Fecha:</span>
+          <span className="step-label">Fecha:</span>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <input 
               type="date" 
@@ -101,7 +101,7 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={() => setActiveTab('agenda')}
         >
           <CalendarIcon size={16} />
-          Agenda & Alertas de Ausentismo
+          Agenda diaria
         </button>
         <button 
           className={`tab-btn ${activeTab === 'queues' ? 'active' : ''}`}
