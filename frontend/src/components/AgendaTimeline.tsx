@@ -30,7 +30,7 @@ export const AgendaTimeline: React.FC<AgendaTimelineProps> = ({
     return appointments.filter(app => {
       const matchProvider = selectedBarber === 'ALL' || app.barber_name === selectedBarber;
       const matchRisk = selectedRisk === 'ALL' || app.ausentismo_risk === selectedRisk;
-      const matchChannel = selectedChannel === 'ALL' || 
+      const matchChannel = selectedChannel === 'ALL' ||
         (selectedChannel === 'WEB' && app.is_self_booked === 1) ||
         (selectedChannel === 'MANUAL' && app.is_self_booked === 0);
       return matchProvider && matchRisk && matchChannel;
@@ -40,7 +40,7 @@ export const AgendaTimeline: React.FC<AgendaTimelineProps> = ({
   return (
     <section className="grid-column">
       <div className="column-card" style={{ flexGrow: 1 }}>
-        
+
         {/* Centered Title Header with simple right-aligned Total text */}
         <div className="column-title" style={{ justifyContent: 'center', position: 'relative' }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -56,9 +56,9 @@ export const AgendaTimeline: React.FC<AgendaTimelineProps> = ({
         <div className="agenda-filter-bar" style={{ justifyContent: 'flex-end' }}>
           <div className="filter-group">
             <Filter size={14} style={{ color: 'var(--text-muted)' }} />
-            
+
             {/* Provider Filter */}
-            <select 
+            <select
               className="filter-select"
               value={selectedBarber}
               onChange={(e) => setSelectedBarber(e.target.value)}
@@ -70,7 +70,7 @@ export const AgendaTimeline: React.FC<AgendaTimelineProps> = ({
             </select>
 
             {/* Risk Filter */}
-            <select 
+            <select
               className="filter-select"
               value={selectedRisk}
               onChange={(e) => setSelectedRisk(e.target.value)}
@@ -82,19 +82,19 @@ export const AgendaTimeline: React.FC<AgendaTimelineProps> = ({
             </select>
 
             {/* Channel Filter */}
-            <select 
+            <select
               className="filter-select"
               value={selectedChannel}
               onChange={(e) => setSelectedChannel(e.target.value)}
             >
               <option value="ALL">Todos los Canales</option>
-              <option value="WEB">Autónoma Digital</option>
-              <option value="MANUAL">Coordinada / Manual</option>
+              <option value="WEB">Página web</option>
+              <option value="MANUAL">WhatsApp / Manual</option>
             </select>
           </div>
 
           {(selectedBarber !== 'ALL' || selectedRisk !== 'ALL' || selectedChannel !== 'ALL') && (
-            <button 
+            <button
               className="clear-filters-btn"
               onClick={() => {
                 setSelectedBarber('ALL');
@@ -109,10 +109,10 @@ export const AgendaTimeline: React.FC<AgendaTimelineProps> = ({
 
         {/* 5-Column Structured Header */}
         <div className="agenda-table-header">
-          <span className="col-header time">Horario & Duración</span>
+          <span className="col-header time">Horario y duración</span>
           <span className="col-header turn">Turno</span>
           <span className="col-header barber">Prestador</span>
-          <span className="col-header channel">Canal de Reserva</span>
+          <span className="col-header channel">Canal de reserva</span>
           <span className="col-header risk">Riesgo</span>
         </div>
 
@@ -124,14 +124,14 @@ export const AgendaTimeline: React.FC<AgendaTimelineProps> = ({
               const isSelected = selectedAppId === app.id;
               const hasAction = triggeredActions[app.id] !== undefined;
               const actionType = triggeredActions[app.id];
-              
+
               return (
-                <div 
-                  key={app.id} 
+                <div
+                  key={app.id}
                   className={`agenda-row-card ${isSelected ? 'selected' : ''} ${hasAction ? 'action-handled' : ''}`}
                   onClick={() => onSelectApp && onSelectApp(app.id)}
                 >
-                  
+
                   {/* Col 1: Horario / Duracion */}
                   <div className="col-cell time">
                     <span className="time-start">{app.start_time.substring(0, 5)}</span>
@@ -164,7 +164,7 @@ export const AgendaTimeline: React.FC<AgendaTimelineProps> = ({
                   {/* Col 4: Canal de Reserva */}
                   <div className="col-cell channel">
                     <span className={`channel-badge ${app.is_self_booked === 1 ? 'web' : 'manual'}`}>
-                      {app.is_self_booked === 1 ? 'Autónoma Digital' : 'Coordinada / Manual'}
+                      {app.is_self_booked === 1 ? 'Página web' : 'WhatsApp / Manual'}
                     </span>
                   </div>
 
