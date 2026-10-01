@@ -8,9 +8,14 @@ import { FALLBACK_QUEUES, FALLBACK_CALENDAR } from '@/data/fallbackData';
 import type { ShopQueueData, Appointment } from '@/types';
 import '@/styles/App.css';
 
+const DEFAULT_DATES: Record<'hellfish' | 'hooligans', string> = {
+  hooligans: '2026-05-29',
+  hellfish: '2026-06-04'
+};
+
 function App() {
-  const [shopId, setShopId] = useState<'hellfish' | 'hooligans'>('hellfish');
-  const [date, setDate] = useState<string>('2026-03-03');
+  const [shopId, setShopId] = useState<'hellfish' | 'hooligans'>('hooligans');
+  const [date, setDate] = useState<string>(DEFAULT_DATES['hooligans']);
   const [activeTab, setActiveTab] = useState<'agenda' | 'queues'>('agenda');
   
   const [loading, setLoading] = useState<boolean>(true);
@@ -25,6 +30,11 @@ function App() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+  const handleShopChange = (newShop: 'hellfish' | 'hooligans') => {
+    setShopId(newShop);
+    setDate(DEFAULT_DATES[newShop]);
+  };
 
   // Fetch metrics and calendar from API
   const fetchData = async () => {
@@ -90,7 +100,7 @@ function App() {
       {/* Header controls & tabs section */}
       <Header 
         shopId={shopId}
-        setShopId={setShopId}
+        setShopId={handleShopChange}
         date={date}
         setDate={setDate}
         isFallbackMode={isFallbackMode}
