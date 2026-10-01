@@ -8,6 +8,6 @@ router = APIRouter(prefix="/api/queues", tags=["Queues"])
 @router.get("", response_model=List[ShopQueueData])
 def get_queue_metrics():
     """
-    Returns pre-computed M/M/s queuing model metrics from queue_metrics.json.
+    Devuelve los parámetros e indicadores del modelo de líneas de espera M/M/s.
     """
     return get_queue_metrics_data()

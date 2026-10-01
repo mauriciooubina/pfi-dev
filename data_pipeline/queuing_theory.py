@@ -6,7 +6,8 @@ import numpy as np
 
 def calculate_mms_metrics(lambda_rate: float, mu_rate: float, s: int):
     """
-    Calculates standard M/M/s queuing model parameters.
+    Calcula analíticamente los parámetros operativos del modelo de colas M/M/s
+    (utilización, probabilidad de sistema desocupado p0, longitud de cola Lq y tiempos de espera Wq y W).
     """
     if s <= 0 or mu_rate <= 0:
         return {
@@ -64,8 +65,8 @@ def calculate_mms_metrics(lambda_rate: float, mu_rate: float, s: int):
 
 def analyze_queues(processed_appointments_path: str, barbers_path_dict: dict, services_path_dict: dict, output_json_path: str = None):
     """
-    Computes λ, μ and M/M/s metrics for both Hellfish and Hooligans from processed data,
-    saving the results to a JSON file.
+    Calcula las tasas empíricas de arribo (lambda), servicio (mu) y métricas M/M/s
+    para cada barbería a partir del historial transaccional consolidado.
     """
     if not os.path.exists(processed_appointments_path):
         print(f"[Error] Processed appointments file not found at {processed_appointments_path}")
@@ -73,7 +74,7 @@ def analyze_queues(processed_appointments_path: str, barbers_path_dict: dict, se
 
     df_all = pd.read_csv(processed_appointments_path)
     
-    # Active barber ID lists
+    # Identificadores de profesionales con puestos de atención activos
     active_barbers = {
         "hellfish": [1, 2, 6],
         "hooligans": [1, 5]
@@ -102,12 +103,11 @@ def analyze_queues(processed_appointments_path: str, barbers_path_dict: dict, se
 
         df_services = pd.read_csv(services_csv)
 
-        # 1. Active Servers (s)
+        # 1. Cantidad de puestos de servicio activos (servidores s)
         s_servers = len(active_barbers[shop])
         print(f"Active servers (s): {s_servers}")
 
-        # 2. Arrival Rate (λ)
-        # Parse times and filter between 10:00 and 20:00
+        # 2. Estimación de tasa de arribos (lambda): demanda por hora en franja operativa (10:00 a 20:00)
         df_shop['start_hour'] = pd.to_datetime(df_shop['start_time'], format='%H:%M:%S', errors='coerce').dt.hour
         df_operational = df_shop[(df_shop['start_hour'] >= 10) & (df_shop['start_hour'] < 20)].copy()
         
@@ -122,8 +122,7 @@ def analyze_queues(processed_appointments_path: str, barbers_path_dict: dict, se
         print(f"Operational window arrivals: {total_arrivals} over {unique_days} days ({total_operational_hours} hours)")
         print(f"Arrival Rate (λ): {lambda_rate:.4f} customers/hour")
 
-        # 3. Service Rate (μ)
-        # Only use served/non-cancelled appointments (target == 0) to get duration
+        # 3. Estimación de tasa de servicio (mu): calculada sobre turnos efectivamente atendidos (target == 0)
         df_served = df_shop[df_shop['target'] == 0].copy()
         if df_served.empty:
             df_served = df_shop.copy()
@@ -140,7 +139,7 @@ def analyze_queues(processed_appointments_path: str, barbers_path_dict: dict, se
         print(f"Average Duration: {mean_duration_minutes:.2f} minutes")
         print(f"Service Rate (μ) per server: {mu_rate:.4f} services/hour")
 
-        # Calculate M/M/s metrics
+        # Resolución de ecuaciones estacionarias M/M/s
         metrics = calculate_mms_metrics(lambda_rate, mu_rate, s_servers)
         
         # Structure matching API response schema

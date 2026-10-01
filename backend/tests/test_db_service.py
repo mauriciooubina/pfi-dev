@@ -18,7 +18,6 @@ def test_fetch_appointments_from_db_live_or_mock():
         assert not df.empty
         assert "shop_id" in df.columns
     except Exception:
-        # Mock test if container port forwarding differs
         with patch("psycopg2.connect") as mock_connect:
             mock_conn = MagicMock()
             mock_connect.return_value = mock_conn

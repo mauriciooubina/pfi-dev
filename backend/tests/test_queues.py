@@ -24,7 +24,6 @@ def test_get_queues_api(client):
 
 def test_queues_service_fallback_on_db_error():
     with patch("app.services.queue_service.fetch_queue_metrics_from_db", side_effect=Exception("DB Down")):
-        # Should fallback to JSON gracefully
         data = get_queue_metrics_data()
         assert isinstance(data, list)
         assert len(data) >= 1

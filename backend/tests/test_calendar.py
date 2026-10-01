@@ -35,7 +35,6 @@ def test_get_calendar_nonexistent_shop(client):
 
 def test_calendar_service_fallback_on_db_error():
     with patch("app.services.calendar_service.fetch_appointments_from_db", side_effect=Exception("DB Connection Refused")):
-        # Should fallback to CSV without raising unhandled exception
         result = get_calendar_data(shop_id="hellfish")
         assert result.shop_id == "hellfish"
         assert result.total_appointments >= 0

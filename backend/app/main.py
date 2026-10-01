@@ -3,7 +3,6 @@ import sys
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Add backend directory and project root to path for imports
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
@@ -12,11 +11,10 @@ from app.routers import calendar, queues
 
 app = FastAPI(
     title="Sistema de Predicción de Ausentismo",
-    description="Backend en FastAPI con endpoints de agenda, simulación de riesgos y métricas de colas M/M/s.",
+    description="Backend en FastAPI con inferencia de ausentismo en tiempo real y dimensionamiento estocástico M/M/s.",
     version="1.0.0"
 )
 
-# Enable CORS using environment variables
 app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_ALLOWED_ORIGINS,
@@ -25,7 +23,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Register routers
 app.include_router(calendar.router)
 app.include_router(queues.router)
 

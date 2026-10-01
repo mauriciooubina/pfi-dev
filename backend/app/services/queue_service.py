@@ -5,9 +5,7 @@ from app.config import QUEUE_METRICS_JSON, DATA_SOURCE
 from app.services.db_service import fetch_queue_metrics_from_db
 
 def get_queue_metrics_data():
-    """
-    Loads M/M/s queuing model metrics from PostgreSQL when DATA_SOURCE='POSTGRES' (with automatic fallback to JSON if DB is down).
-    """
+    """Obtiene las métricas de líneas de espera M/M/s desde la base de datos o JSON local."""
     try:
         if DATA_SOURCE == "POSTGRES":
             try:

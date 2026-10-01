@@ -10,6 +10,6 @@ def get_calendar(
     date: str = Query(None, description="Fecha en formato YYYY-MM-DD. Si no se especifica, toma la primera fecha disponible.")
 ):
     """
-    Returns appointments for a specific date and shop, attaching simulated absenteeism risk flags.
+    Devuelve los turnos para un comercio y fecha, evaluando el riesgo de ausentismo en tiempo real.
     """
     return get_calendar_data(shop_id=shop_id, date=date)

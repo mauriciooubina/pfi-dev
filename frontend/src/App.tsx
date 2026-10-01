@@ -9,7 +9,7 @@ import type { ShopQueueData, Appointment } from '@/types';
 import '@/styles/App.css';
 
 const DEFAULT_DATES: Record<'hellfish' | 'hooligans', string> = {
-  hooligans: '2026-05-29',
+  hooligans: '2026-01-21',
   hellfish: '2026-06-04'
 };
 
@@ -25,7 +25,6 @@ function App() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [selectedAppId, setSelectedAppId] = useState<number | null>(null);
   
-  // Interactive action states
   const [triggeredActions, setTriggeredActions] = useState<Record<number, string>>({});
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -36,11 +35,9 @@ function App() {
     setDate(DEFAULT_DATES[newShop]);
   };
 
-  // Fetch metrics and calendar from API
   const fetchData = async () => {
     setLoading(true);
     try {
-      // 1. Fetch queues
       const queuesRes = await fetch(`${API_URL}/api/queues`);
       if (!queuesRes.ok) throw new Error('API Queues error');
       const queuesData: ShopQueueData[] = await queuesRes.json();
@@ -48,7 +45,6 @@ function App() {
       const currentShopQueue = queuesData.find((q) => q.shop_id === shopId);
       setQueueMetrics(currentShopQueue || null);
 
-      // 2. Fetch calendar
       const calendarRes = await fetch(`${API_URL}/api/calendar?shop_id=${shopId}&date=${date}`);
       if (!calendarRes.ok) throw new Error('API Calendar error');
       const calendarData = await calendarRes.json();
@@ -59,7 +55,6 @@ function App() {
       console.warn("FastAPI backend is offline or unreachable. Loading fallback static mock data for demo...");
       setIsFallbackMode(true);
       
-      // Fallback calculations
       const currentFallbackShop = FALLBACK_QUEUES.find((q) => q.shop_id === shopId);
       setQueueMetrics(currentFallbackShop || null);
       
@@ -74,13 +69,11 @@ function App() {
     fetchData();
   }, [shopId, date]);
 
-  // Trigger temporary notification toast
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 4000);
   };
 
-  // Trigger action simulation
   const handleAction = (appId: number, clientHash: string, actionType: 'whatsapp' | 'confirm') => {
     if (actionType === 'whatsapp') {
       setTriggeredActions(prev => ({ ...prev, [appId]: 'whatsapp' }));

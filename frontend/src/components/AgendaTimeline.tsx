@@ -15,17 +15,14 @@ export const AgendaTimeline: React.FC<AgendaTimelineProps> = ({
   selectedAppId,
   onSelectApp
 }) => {
-  // Filter states
   const [selectedBarber, setSelectedBarber] = useState<string>('ALL');
   const [selectedRisk, setSelectedRisk] = useState<string>('ALL');
   const [selectedChannel, setSelectedChannel] = useState<string>('ALL');
 
-  // Unique providers list for filter dropdown
   const uniqueProviders = useMemo(() => {
     return Array.from(new Set(appointments.map(a => a.barber_name)));
   }, [appointments]);
 
-  // Filtered appointments
   const filteredAppointments = useMemo(() => {
     return appointments.filter(app => {
       const matchProvider = selectedBarber === 'ALL' || app.barber_name === selectedBarber;

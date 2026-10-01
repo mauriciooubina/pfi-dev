@@ -13,9 +13,10 @@ class AppointmentResponse(BaseModel):
     service_duration: int
     client_hashed: str
     is_self_booked: int
-    target: Optional[int]
-    ausentismo_risk: str  # "ALTO" | "MEDIO" | "BAJO"
-    color_code: str       # Hex or Tailwind color for risk
+    target: Optional[int] = None
+    ausentismo_risk: str
+    color_code: str
+    diagnostic: Optional[str] = None
 
 class CalendarResponse(BaseModel):
     shop_id: str

@@ -33,4 +33,5 @@ export interface Appointment {
   target: number | null;
   ausentismo_risk: 'ALTO' | 'MEDIO' | 'BAJO' | string;
   color_code: string;
+  diagnostic?: string;
 }

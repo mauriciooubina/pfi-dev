@@ -247,7 +247,6 @@ def main():
     preprocessor = build_preprocessor(features_num, features_cat)
     metrics_summary, roc_curves_data, best_cm, models = train_and_evaluate(X, y, preprocessor)
     
-    # Imprimir tabla comparativa final
     print("\n========================================================================================")
     print("                      RESUMEN DE MÉTRICAS (5-FOLD STRATIFIED CV)                        ")
     print("========================================================================================")
@@ -257,16 +256,13 @@ def main():
         print(f"{name:22s} | {m['f1_mean']:.4f} ±{m['f1_std']:.2f} | {m['recall_mean']:.4f}     | {m['precision_mean']:.4f}        | {m['roc_auc_mean']:.4f}      | {m['accuracy_mean']:.4f}")
     print("========================================================================================")
     
-    # Guardar métricas en JSON
     metrics_json_path = os.path.join(BASE_DIR, 'data', 'processed', 'ml_metrics_summary.json')
     with open(metrics_json_path, 'w', encoding='utf-8') as f:
         json.dump(metrics_summary, f, indent=2, ensure_ascii=False)
     print(f"[+] Métricas exportadas a {metrics_json_path}")
     
-    # Generar gráficos
     plot_and_save_charts(roc_curves_data, best_cm)
     
-    # Exportar modelo ganador
     export_final_model(X, y, preprocessor)
     print("\n[✔] Proceso de entrenamiento y serialización completado con éxito.")
 

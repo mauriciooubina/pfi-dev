@@ -5,8 +5,7 @@ import numpy as np
 
 def get_crypto_salt(shop_id: str) -> str:
     """
-    Get the cryptographic salt for the specified shop from environment variables,
-    falling back to predefined defaults if not found.
+    Obtiene el salt criptográfico asignado al comercio para dar cumplimiento a la Ley 25.326.
     """
     shop_id_upper = shop_id.upper()
     if "HELLFISH" in shop_id_upper:
@@ -18,8 +17,7 @@ def get_crypto_salt(shop_id: str) -> str:
 
 def hash_sensitive_data(val: str, salt: str) -> str:
     """
-    Compute a SHA-256 cryptographic hash of the input value concatenated with a salt,
-    truncated to 16 characters. Safe against nuls and formatting errors.
+    Genera el hash SHA-256 truncado a 16 caracteres para seudonimizar datos sensibles.
     """
     try:
         if pd.isna(val) or not str(val).strip() or str(val).strip().lower() in ['nan', 'null', 'none']:
@@ -34,11 +32,10 @@ def hash_sensitive_data(val: str, salt: str) -> str:
 
 def safe_parse_datetime(date_series: pd.Series, time_series: pd.Series = None) -> pd.Series:
     """
-    Helper to parse datetime strings safely with try-except fallback.
+    Conversión segura de cadenas de fecha y hora a objetos datetime de pandas.
     """
     try:
         if time_series is not None:
-            # Combine date and time, replacing NaN string formats
             combined = date_series.astype(str) + ' ' + time_series.astype(str)
             clean_combined = combined.apply(
                 lambda x: np.nan if any(t in str(x).lower() for t in ['nan', 'null', 'none', 'nat']) else str(x).strip()
@@ -61,7 +58,7 @@ def safe_parse_datetime(date_series: pd.Series, time_series: pd.Series = None) -
 
 def make_tz_naive(series: pd.Series) -> pd.Series:
     """
-    Ensure a pandas datetime Series is timezone-naive so it can be subtracted.
+    Normaliza series datetime eliminando la zona horaria para operaciones temporales.
     """
     try:
         if not pd.api.types.is_datetime64_any_dtype(series):

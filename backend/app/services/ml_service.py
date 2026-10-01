@@ -28,13 +28,10 @@ def predict_appointment_risk(
     row: pd.Series,
     all_appointments_df: Optional[pd.DataFrame] = None
 ) -> Tuple[str, str, float]:
-    """
-    Predice el nivel de riesgo de ausentismo utilizando el modelo Gradient Boosting entrenado.
-    Devuelve (risk_level, color_code, probability).
-    """
+    """Predice el nivel de riesgo de ausentismo del turno. Devuelve (nivel, color, probabilidad)."""
     model = get_ml_model()
     
-    # 1. Regla de resguardo operativo: barbero inactivo es siempre riesgo ALTO
+    # Regla de resguardo operativo: si el barbero está inactivo, se clasifica riesgo alto
     barber_active = bool(row.get('barber_active', True)) if not pd.isna(row.get('barber_active', True)) else True
     if not barber_active:
         return "ALTO", "#ef4444", 0.99
@@ -50,19 +47,29 @@ def predict_appointment_risk(
     month = int(row.get('month', 3)) if not pd.isna(row.get('month')) else 3
     barber_id = str(row.get('barber_id', '1'))
     
-    # Métricas históricas del cliente
     client_past_apps = 0
     client_past_noshows = 0
     client_noshow_rate = 0.0
     client_is_new = 1
     
-    if all_appointments_df is not None and 'client_hashed' in row and 'appointment_start' in row:
+    if all_appointments_df is not None and 'client_hashed' in row:
         client_hash = row['client_hashed']
-        app_start = row['appointment_start']
-        past = all_appointments_df[
-            (all_appointments_df['client_hashed'] == client_hash) &
-            (all_appointments_df['appointment_start'] < app_start)
-        ]
+        app_start = row.get('appointment_start')
+        app_date = str(row.get('date', ''))
+        
+        if app_start and not pd.isna(app_start):
+            past = all_appointments_df[
+                (all_appointments_df['client_hashed'] == client_hash) &
+                (all_appointments_df['appointment_start'] < app_start)
+            ]
+        elif app_date:
+            past = all_appointments_df[
+                (all_appointments_df['client_hashed'] == client_hash) &
+                (all_appointments_df['date'] < app_date)
+            ]
+        else:
+            past = pd.DataFrame()
+
         if not past.empty:
             client_past_apps = len(past)
             client_past_noshows = int(past['target'].sum()) if 'target' in past else 0
@@ -89,7 +96,7 @@ def predict_appointment_risk(
             
             prob = float(model.predict_proba(features)[0, 1])
             
-            # Calibración de umbrales optimizada para F1
+            # Calibración de umbrales optimizada para maximizar F1 en clases desbalanceadas
             if prob >= 0.40:
                 return "ALTO", "#ef4444", round(prob, 4)
             elif prob >= 0.20:
@@ -99,7 +106,7 @@ def predict_appointment_risk(
         except Exception as err:
             print(f"[!] Error en predicción ML: {err}")
 
-    # Fallback heurístico si falla la inferencia
+    # Reglas heurísticas de contingencia ante ausencia del artefacto ML
     if lead_time > 72.0 and is_self_booked:
         return "ALTO", "#ef4444", 0.75
     elif lead_time < 6.0 and is_self_booked:

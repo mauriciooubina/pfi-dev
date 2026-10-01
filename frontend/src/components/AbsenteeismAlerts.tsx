@@ -15,14 +15,11 @@ export const AbsenteeismAlerts: React.FC<AbsenteeismAlertsProps> = ({
   handleAction,
   selectedAppId
 }) => {
-  // Multi-select risk filters (default ALTO and MEDIO active for urgent triggers)
   const [activeRisks, setActiveRisks] = useState<string[]>(['ALTO', 'MEDIO']);
   
-  // Sort controls: Field ('risk' | 'time') and Direction ('asc' | 'desc')
   const [sortField, setSortField] = useState<'risk' | 'time'>('risk');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
-  // Toggle risk selection in multi-select filter
   const toggleRiskFilter = (riskLevel: string) => {
     if (activeRisks.includes(riskLevel)) {
       if (activeRisks.length > 1) {
@@ -33,17 +30,13 @@ export const AbsenteeismAlerts: React.FC<AbsenteeismAlertsProps> = ({
     }
   };
 
-  // Toggle ASC/DESC order
   const toggleSortDirection = () => {
     setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
   };
 
-  // Filtered and sorted alerts
   const processedAlerts = useMemo(() => {
-    // 1. Filter by active risk levels
     let list = appointments.filter(app => activeRisks.includes(app.ausentismo_risk));
 
-    // 2. Sort
     list = [...list].sort((a, b) => {
       if (sortField === 'risk') {
         const weight: Record<string, number> = { ALTO: 3, MEDIO: 2, BAJO: 1 };
@@ -54,7 +47,6 @@ export const AbsenteeismAlerts: React.FC<AbsenteeismAlertsProps> = ({
         }
         return a.start_time.localeCompare(b.start_time);
       } else {
-        // Sort by time
         const cmp = a.start_time.localeCompare(b.start_time);
         return sortDirection === 'asc' ? cmp : -cmp;
       }
@@ -63,7 +55,6 @@ export const AbsenteeismAlerts: React.FC<AbsenteeismAlertsProps> = ({
     return list;
   }, [appointments, activeRisks, sortField, sortDirection]);
 
-  // Smooth scroll and focus effect when selectedAppId changes
   useEffect(() => {
     if (selectedAppId) {
       const el = document.getElementById(`alert-card-${selectedAppId}`);
@@ -73,35 +64,22 @@ export const AbsenteeismAlerts: React.FC<AbsenteeismAlertsProps> = ({
     }
   }, [selectedAppId]);
 
-  // Helper to generate dynamic, hyper-descriptive diagnosis messages based on appointment attributes
   const getDiagnosisText = (app: Appointment) => {
-    const isInactive = app.barber_name.toLowerCase().includes('inactivo');
-    const isWeb = app.is_self_booked === 1;
-
+    if (app.diagnostic) {
+      return app.diagnostic;
+    }
+    const isInactive = app.barber_name.toLowerCase().includes("inactivo");
     if (isInactive) {
-      return `El prestador asignado (${app.barber_name}) se encuentra inactivo. Se requiere reasignar el turno.`;
+      return "El profesional asignado figura inactivo en el sistema.";
     }
-    
-    if (app.ausentismo_risk === 'ALTO') {
-      if (isWeb) {
-        return `Reserva autónoma realizada con alta anticipación sin interacción reciente. Se recomienda recordatorio urgente.`;
-      } else {
-        return `Turno agendado con largo tiempo de antelación sin re-confirmación previa. Se sugiere contactar al cliente.`;
-      }
+    if (app.ausentismo_risk === "ALTO") {
+      return "Turno agendado con varios días de anticipación sin confirmar.";
     }
-
-    if (app.ausentismo_risk === 'MEDIO') {
-      if (isWeb) {
-        return `Reserva autónoma realizada a menos de 6 horas del turno pendiente de verificación por WhatsApp.`;
-      } else {
-        return `Turno asignado a ${app.barber_name} con antelación moderada pendiente de re-confirmación.`;
-      }
+    if (app.ausentismo_risk === "MEDIO") {
+      return "Turno en horario concurrido pendiente de reconfirmación.";
     }
-
-    // BAJO
-    return `El cliente tiene un historial confiable de asistencia y bajo margen de ausentismo.`;
+    return "Cliente habitual con asistencia regular.";
   };
-
   return (
     <section className="grid-column">
       <div className="column-card">
