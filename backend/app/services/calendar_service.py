@@ -4,16 +4,25 @@ from fastapi import HTTPException
 from app.config import PROCESSED_FILE, DATA_SOURCE
 from app.schemas.calendar import CalendarResponse, AppointmentResponse
 from app.services.db_service import fetch_appointments_from_db
+from app.services.ml_service import predict_appointment_risk
 
 def get_calendar_data(shop_id: str, date: str = None) -> CalendarResponse:
     """
-    Returns appointments for a specific date and shop, attaching simulated/predicted risk flags.
-    Reads from PostgreSQL when DATA_SOURCE='POSTGRES' (with automatic fallback to CSV if DB is down).
+    Devuelve los turnos para una fecha y comercio específicos, calculando el riesgo
+    de ausentismo en tiempo real mediante el modelo de Machine Learning (Gradient Boosting).
     """
     try:
         use_postgres = (DATA_SOURCE == "POSTGRES")
         df_date = None
+        all_df = None
         
+        # Cargar tabla histórica de referencia si existe para calcular métricas de cliente
+        if os.path.exists(PROCESSED_FILE):
+            try:
+                all_df = pd.read_csv(PROCESSED_FILE)
+            except Exception:
+                all_df = None
+
         if use_postgres:
             try:
                 df_date = fetch_appointments_from_db(shop_id=shop_id, date=date)
@@ -27,8 +36,9 @@ def get_calendar_data(shop_id: str, date: str = None) -> CalendarResponse:
                     status_code=404, 
                     detail="Processed appointments CSV file not found. Run the ETL pipeline first."
                 )
-            df = pd.read_csv(PROCESSED_FILE)
-            df_shop = df[df['shop_id'] == shop_id.lower()].copy()
+            if all_df is None:
+                all_df = pd.read_csv(PROCESSED_FILE)
+            df_shop = all_df[all_df['shop_id'] == shop_id.lower()].copy()
             if df_shop.empty:
                 raise HTTPException(status_code=404, detail=f"No data found for shop: {shop_id}")
             target_date = date if date else str(df_shop['date'].iloc[0])
@@ -37,25 +47,11 @@ def get_calendar_data(shop_id: str, date: str = None) -> CalendarResponse:
         else:
             target_date = str(df_date['date'].iloc[0])
 
-
         appointments = []
         
-        # Risk simulation/prediction rules:
+        # Inferencia de riesgo con Machine Learning
         for _, row in df_date.iterrows():
-            lead_time = row['lead_time_hours'] if not pd.isna(row['lead_time_hours']) else 24.0
-            self_booked = row['is_self_booked'] == 1
-            barber_active = bool(row['barber_active']) if not pd.isna(row['barber_active']) else True
-            
-            # Predict risk flag
-            if not barber_active or (lead_time > 72.0 and self_booked):
-                risk = "ALTO"
-                color = "#ef4444" # red-500
-            elif lead_time < 6.0 and self_booked:
-                risk = "MEDIO"
-                color = "#f59e0b" # amber-500
-            else:
-                risk = "BAJO"
-                color = "#10b981" # emerald-500
+            risk, color, prob = predict_appointment_risk(row, all_appointments_df=all_df)
                 
             appointments.append(
                 AppointmentResponse(
@@ -70,7 +66,7 @@ def get_calendar_data(shop_id: str, date: str = None) -> CalendarResponse:
                     service_duration=int(row['duration']) if pd.notna(row['duration']) else 30,
                     client_hashed=str(row['client_hashed']),
                     is_self_booked=int(row['is_self_booked']),
-                    target=int(row['target']) if not pd.isna(row['target']) else None,
+                    target=int(row['target']) if not pd.isna(row.get('target')) else None,
                     ausentismo_risk=risk,
                     color_code=color
                 )
@@ -90,4 +86,3 @@ def get_calendar_data(shop_id: str, date: str = None) -> CalendarResponse:
             status_code=500, 
             detail=f"Error reading calendar data ({DATA_SOURCE}): {str(e)}"
         )
-
