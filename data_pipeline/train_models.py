@@ -25,7 +25,7 @@ BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 DATA_PATH = os.path.join(BASE_DIR, 'data', 'processed', 'processed_appointments_matrix.csv')
 MODELS_DIR = os.path.join(BASE_DIR, 'backend', 'app', 'models')
 PLOTS_DIR = os.path.join(BASE_DIR, 'data_pipeline', 'plots')
-LATEX_IMG_DIR = '/Users/mauriciooubina/Downloads/UADE_PFI_Template-develop/images'
+LATEX_IMG_DIR = os.getenv('LATEX_IMG_DIR', os.path.join(BASE_DIR, 'data_pipeline', 'plots'))
 
 os.makedirs(MODELS_DIR, exist_ok=True)
 os.makedirs(PLOTS_DIR, exist_ok=True)

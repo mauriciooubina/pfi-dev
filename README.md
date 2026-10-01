@@ -1,12 +1,10 @@
-# 💈 PFI UADE - Sistema de Predicción de Ausentismo y Optimización de Capacidad
+# PFI UADE - Sistema de predicción de ausentismo en comercios de servicios con agenda híbrida
 
-Sistema integral de gestión predictiva de ausentismo (*No-Show*) y optimización estocástica de capacidad operativa para comercios de servicios con agenda híbrida (Barberías / Centros de Estética / Servicios Personales).
-
-Desarrollado como Proyecto de Fin de Ingeniería (PFI) - Universidad Argentina de la Empresa (UADE), 2026.
+Proyecto Final de Ingeniería (PFI) - Universidad Argentina de la Empresa (UADE), 2026.
 
 ---
 
-## 🛠️ Stack Tecnológico
+## Stack Tecnológico
 
 - **Frontend:** React 19, Vite, TypeScript, Modern Grid CSS.
 - **Backend:** FastAPI, Uvicorn (ASGI), Pydantic v2, Python 3.13.
@@ -16,7 +14,7 @@ Desarrollado como Proyecto de Fin de Ingeniería (PFI) - Universidad Argentina d
 
 ---
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```text
 pfi/
@@ -68,7 +66,7 @@ pfi/
 
 ---
 
-## ⚙️ Modos de Ejecución y Feature Flag (`DATA_SOURCE`)
+## Modos de Ejecución y Feature Flag (`DATA_SOURCE`)
 
 El backend soporta un **Feature Flag de fuente de datos** mediante la variable de entorno `DATA_SOURCE` en el archivo `.env`:
 
@@ -81,7 +79,7 @@ El backend soporta un **Feature Flag de fuente de datos** mediante la variable d
 
 ---
 
-## 🚀 Guía de Instalación y Puesta en Marcha
+## Guía de Instalación y Puesta en Marcha
 
 ### 1. Requisitos Previos
 - Docker y Docker Desktop instalados y corriendo.
@@ -137,10 +135,10 @@ El dashboard estará disponible en: **`http://localhost:5173`**
 
 ---
 
-## 🔌 Endpoints de la REST API (FastAPI)
+## Endpoints de la REST API (FastAPI)
 
 Una vez iniciado el backend, se puede acceder a la documentación interactiva OpenAPI (Swagger UI) en:
-👉 **`http://localhost:8000/docs`**
+**`http://localhost:8000/docs`**
 
 | Método | Endpoint | Descripción |
 | :--- | :--- | :--- |
@@ -149,7 +147,7 @@ Una vez iniciado el backend, se puede acceder a la documentación interactiva Op
 
 ---
 
-## 🔒 Cumplimiento Normativo (Ley N° 25.326)
+## Cumplimiento Normativo (Ley N° 25.326)
 
 Toda la información personal e identificable de clientes (nombres y números telefónicos) es sometida a un proceso irreversibles de **anonimización criptográfica mediante algoritmos Hash SHA-256 combinados con sales dinámicas por comercio (*Salted Hashing*)** durante la fase ETL, garantizando el cumplimiento normativo de la Ley Argentina de Protección de Datos Personales.
 

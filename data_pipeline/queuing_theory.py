@@ -30,7 +30,6 @@ def calculate_mms_metrics(lambda_rate: float, mu_rate: float, s: int):
             "stable": False
         }
 
-    # Calculate P0
     sum_terms = 0.0
     for n in range(s):
         sum_terms += ((s * rho) ** n) / math.factorial(n)
@@ -38,19 +37,15 @@ def calculate_mms_metrics(lambda_rate: float, mu_rate: float, s: int):
     p0_inv = sum_terms + ((s * rho) ** s) / (math.factorial(s) * (1 - rho))
     p0 = 1.0 / p0_inv if p0_inv != 0 else 0.0
 
-    # Calculate Lq
     lq_numerator = p0 * ((s * rho) ** s) * rho
     lq_denominator = math.factorial(s) * ((1 - rho) ** 2)
     Lq = lq_numerator / lq_denominator if lq_denominator != 0 else 0.0
 
-    # Calculate Wq
     Wq_hours = Lq / lambda_rate if lambda_rate > 0 else 0.0
     Wq_minutes = Wq_hours * 60.0
 
-    # Calculate L
     L = Lq + (lambda_rate / mu_rate)
 
-    # Calculate W
     W_hours = L / lambda_rate if lambda_rate > 0 else (1.0 / mu_rate)
     W_minutes = W_hours * 60.0
 
