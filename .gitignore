@@ -28,3 +28,6 @@ frontend/dist/
 # IDEs
 .vscode/
 .idea/
+
+# Datasets crudos con datos personales (Ley 25.326)
+data/raw/

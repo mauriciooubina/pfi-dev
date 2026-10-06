@@ -1,4 +1,0 @@
-id,name,role,image,email,instagram,active,commission,sale_commission
-1,Sebastian Fraga,admin,https://ptiogpplnhwootvybfsi.supabase.co/storage/v1/object/public/barbers//sebastianfraga.png,sebafraga99@gmail.com,sebafraga99,true,0.5,0.2
-4,Valen,barber,,Sebafraga@gmail.com,@,false,0.5,0.2
-5,Valentino,barber,https://ptiogpplnhwootvybfsi.supabase.co/storage/v1/object/public/barbers/1764535900068.jpeg,valentinospregiato@gmail.com,valen_spregiato,true,0.6,0.2
