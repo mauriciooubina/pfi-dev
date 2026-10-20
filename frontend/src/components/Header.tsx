@@ -27,9 +27,9 @@ export const Header: React.FC<HeaderProps> = ({
       
       {/* Title Hero */}
       <div className="header-title-area">
-        <h1>SISTEMA DE PREDICCIÓN DE AUSENTISMO</h1>
+        <h1>TurnoFiel</h1>
         <p>
-          Proyecto Final de Ingeniería - UADE 2026
+          Sistema de predicción de ausentismo en comercios de servicios con agenda híbrida
           {isFallbackMode && (
             <span style={{ 
               marginLeft: '12px', 
