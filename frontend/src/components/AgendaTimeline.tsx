@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Calendar as CalendarIcon, Check, Filter } from 'lucide-react';
+import { Calendar as CalendarIcon, Check, Filter, Plus, MessageSquare } from 'lucide-react';
 import type { Appointment } from '@/types';
 
 interface AgendaTimelineProps {
@@ -7,13 +7,15 @@ interface AgendaTimelineProps {
   triggeredActions: Record<number, string>;
   selectedAppId?: number | null;
   onSelectApp?: (appId: number) => void;
+  onOpenSimulateModal?: () => void;
 }
 
 export const AgendaTimeline: React.FC<AgendaTimelineProps> = ({
   appointments,
   triggeredActions,
   selectedAppId,
-  onSelectApp
+  onSelectApp,
+  onOpenSimulateModal
 }) => {
   const [selectedBarber, setSelectedBarber] = useState<string>('ALL');
   const [selectedRisk, setSelectedRisk] = useState<string>('ALL');
@@ -38,15 +40,38 @@ export const AgendaTimeline: React.FC<AgendaTimelineProps> = ({
     <section className="grid-column">
       <div className="column-card" style={{ flexGrow: 1 }}>
 
-        {/* Centered Title Header with simple right-aligned Total text */}
-        <div className="column-title" style={{ justifyContent: 'center', position: 'relative' }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <CalendarIcon size={20} />
-            Agenda diaria
-          </span>
-          <span style={{ position: 'absolute', right: 0, fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>
-            Total: {appointments.length} turnos
-          </span>
+        {/* Title Header: Botón a la izquierda | Título centrado | Total a la derecha */}
+        <div className="column-title" style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px' }}>
+          
+          {/* Left: Botón Agendar Turno */}
+          <div>
+            {onOpenSimulateModal && (
+              <button 
+                className="btn-agendar-turno"
+                onClick={onOpenSimulateModal}
+                title="Agendar nuevo turno"
+              >
+                <Plus size={15} />
+                Agendar turno
+              </button>
+            )}
+          </div>
+
+          {/* Center: Título Centrado */}
+          <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <CalendarIcon size={18} />
+            <span style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+              Agenda diaria
+            </span>
+          </div>
+
+          {/* Right: Total de Turnos */}
+          <div>
+            <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>
+              Total: {appointments.length} turnos
+            </span>
+          </div>
+
         </div>
 
         {/* Interactive Filter Controls (Right Aligned underneath) */}
@@ -60,7 +85,7 @@ export const AgendaTimeline: React.FC<AgendaTimelineProps> = ({
               value={selectedBarber}
               onChange={(e) => setSelectedBarber(e.target.value)}
             >
-              <option value="ALL">Todos los Prestadores</option>
+              <option value="ALL">Todos los prestadores</option>
               {uniqueProviders.map(p => (
                 <option key={p} value={p}>{p}</option>
               ))}
@@ -72,10 +97,10 @@ export const AgendaTimeline: React.FC<AgendaTimelineProps> = ({
               value={selectedRisk}
               onChange={(e) => setSelectedRisk(e.target.value)}
             >
-              <option value="ALL">Todos los Riesgos</option>
-              <option value="ALTO">Riesgo Alto</option>
-              <option value="MEDIO">Riesgo Medio</option>
-              <option value="BAJO">Riesgo Bajo</option>
+              <option value="ALL">Todos los riesgos</option>
+              <option value="ALTO">Riesgo alto</option>
+              <option value="MEDIO">Riesgo medio</option>
+              <option value="BAJO">Riesgo bajo</option>
             </select>
 
             {/* Channel Filter */}
@@ -84,7 +109,7 @@ export const AgendaTimeline: React.FC<AgendaTimelineProps> = ({
               value={selectedChannel}
               onChange={(e) => setSelectedChannel(e.target.value)}
             >
-              <option value="ALL">Todos los Canales</option>
+              <option value="ALL">Todos los canales</option>
               <option value="WEB">Página web</option>
               <option value="MANUAL">WhatsApp / Manual</option>
             </select>
@@ -125,7 +150,7 @@ export const AgendaTimeline: React.FC<AgendaTimelineProps> = ({
               return (
                 <div
                   key={app.id}
-                  className={`agenda-row-card ${isSelected ? 'selected' : ''} ${hasAction ? 'action-handled' : ''}`}
+                  className={`agenda-row-card ${isSelected ? 'selected' : ''} ${hasAction ? `action-handled ${actionType}` : ''}`}
                   onClick={() => onSelectApp && onSelectApp(app.id)}
                 >
 
@@ -135,10 +160,25 @@ export const AgendaTimeline: React.FC<AgendaTimelineProps> = ({
                     <span className="time-duration">{app.service_duration} min</span>
                   </div>
 
-                  {/* Col 2: Turno (ID + Cliente + Servicio + Precio) */}
+                  {/* Col 2: Turno (ID + Status Chip + Cliente + Servicio + Precio) */}
                   <div className="col-cell turn">
-                    <div className="turn-id-tag" style={{ fontSize: '0.75rem', fontWeight: 700, color: '#a5b4fc' }}>
-                      #{app.id}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span className="turn-id-tag" style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--secondary)' }}>
+                        #{app.id}
+                      </span>
+                      {hasAction && (
+                        <span className={`handled-status-tag ${actionType}`}>
+                          {actionType === 'whatsapp' ? (
+                            <>
+                              <MessageSquare size={10} /> Notificado
+                            </>
+                          ) : (
+                            <>
+                              <Check size={11} /> Confirmado
+                            </>
+                          )}
+                        </span>
+                      )}
                     </div>
                     <div className="client-title" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                       <span>Cliente {app.client_hashed}</span>
@@ -165,16 +205,11 @@ export const AgendaTimeline: React.FC<AgendaTimelineProps> = ({
                     </span>
                   </div>
 
-                  {/* Col 5: Riesgo & Action Badge */}
+                  {/* Col 5: Riesgo Predicho por ML */}
                   <div className="col-cell risk">
                     <span className={`risk-badge ${app.ausentismo_risk.toLowerCase()}`}>
                       {app.ausentismo_risk}
                     </span>
-                    {hasAction && (
-                      <span className="handled-status-tag">
-                        <Check size={11} /> {actionType === 'whatsapp' ? 'Notificado' : 'Confirmado'}
-                      </span>
-                    )}
                   </div>
 
                 </div>

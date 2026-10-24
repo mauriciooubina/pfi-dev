@@ -4,6 +4,7 @@ import { QueueMetricsColumn } from '@/components/QueueMetricsColumn';
 import { AgendaTimeline } from '@/components/AgendaTimeline';
 import { AbsenteeismAlerts } from '@/components/AbsenteeismAlerts';
 import { ToastNotification } from '@/components/ToastNotification';
+import { SimulateAppointmentModal } from '@/components/SimulateAppointmentModal';
 import { FALLBACK_QUEUES, FALLBACK_CALENDAR } from '@/data/fallbackData';
 import type { ShopQueueData, Appointment } from '@/types';
 import '@/styles/App.css';
@@ -20,6 +21,7 @@ function App() {
   
   const [loading, setLoading] = useState<boolean>(true);
   const [isFallbackMode, setIsFallbackMode] = useState<boolean>(false);
+  const [isSimulateModalOpen, setIsSimulateModalOpen] = useState<boolean>(false);
   
   const [queueMetrics, setQueueMetrics] = useState<ShopQueueData | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -77,11 +79,25 @@ function App() {
   const handleAction = (appId: number, clientHash: string, actionType: 'whatsapp' | 'confirm') => {
     if (actionType === 'whatsapp') {
       setTriggeredActions(prev => ({ ...prev, [appId]: 'whatsapp' }));
-      triggerToast(`Recordatorio de WhatsApp enviado al cliente (Hash: ${clientHash})`);
+      triggerToast(`Recordatorio de WhatsApp enviado al cliente ${clientHash}.`);
     } else {
       setTriggeredActions(prev => ({ ...prev, [appId]: 'confirmed' }));
-      triggerToast(`Turno #${appId} confirmado exitosamente y re-verificado.`);
+      triggerToast(`Turno #${appId} confirmado exitosamente.`);
     }
+  };
+
+  const handleAppointmentCreated = (newApp: Appointment) => {
+    if (newApp.date && newApp.date !== date) {
+      setDate(newApp.date);
+    }
+    setAppointments(prev => {
+      const filtered = prev.filter(a => a.id !== newApp.id);
+      const updated = [...filtered, newApp].sort((a, b) => a.start_time.localeCompare(b.start_time));
+      return updated;
+    });
+    setSelectedAppId(newApp.id);
+    setActiveTab('agenda');
+    triggerToast('Turno agendado exitosamente.');
   };
 
   return (
@@ -102,6 +118,15 @@ function App() {
         setActiveTab={setActiveTab}
       />
 
+      {/* Live Demo Simulation Modal */}
+      <SimulateAppointmentModal 
+        isOpen={isSimulateModalOpen}
+        onClose={() => setIsSimulateModalOpen(false)}
+        shopId={shopId}
+        currentDate={date}
+        onAppointmentCreated={handleAppointmentCreated}
+      />
+
       {loading ? (
         <div className="loading-container">
           <div className="spinner"></div>
@@ -117,6 +142,7 @@ function App() {
                 triggeredActions={triggeredActions}
                 selectedAppId={selectedAppId}
                 onSelectApp={(id) => setSelectedAppId(prev => prev === id ? null : id)}
+                onOpenSimulateModal={() => setIsSimulateModalOpen(true)}
               />
 
               <AbsenteeismAlerts 
@@ -140,3 +166,4 @@ function App() {
 }
 
 export default App;
+

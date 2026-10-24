@@ -85,7 +85,7 @@ export const AbsenteeismAlerts: React.FC<AbsenteeismAlertsProps> = ({
       <div className="column-card">
         <h2 className="column-title" style={{ borderBottomColor: 'var(--danger-border)', justifyContent: 'center' }}>
           <AlertTriangle size={20} style={{ color: 'var(--danger)' }} />
-          Triggers de Ausentismo
+          Triggers de ausentismo
         </h2>
 
         {/* Filter Multi-Select & Sort Control Bar */}
@@ -147,7 +147,6 @@ export const AbsenteeismAlerts: React.FC<AbsenteeismAlertsProps> = ({
         <div className="alerts-list">
           {processedAlerts.length > 0 ? (
             processedAlerts.map((app) => {
-              const isTriggered = triggeredActions[app.id] !== undefined;
               const actionType = triggeredActions[app.id];
               const isHigh = app.ausentismo_risk === "ALTO";
               const isSelected = selectedAppId === app.id;
@@ -161,11 +160,12 @@ export const AbsenteeismAlerts: React.FC<AbsenteeismAlertsProps> = ({
                   
                   <div className="alert-item-header">
                     <span className="alert-client-hash">
-                      Turno #{app.id} • Cliente: {app.client_hashed}
+                      Turno #{app.id} - Cliente: {app.client_hashed}
                     </span>
                     <span className={`risk-badge ${app.ausentismo_risk.toLowerCase()}`} style={{ fontSize: '0.65rem', padding: '2px 6px' }}>
                       {app.ausentismo_risk}
                     </span>
+
                   </div>
 
                   <div className="alert-reason">
@@ -180,16 +180,30 @@ export const AbsenteeismAlerts: React.FC<AbsenteeismAlertsProps> = ({
                   </div>
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                    <span>Hora: {app.start_time.substring(0, 5)} hs</span>
+                    <span>Horario: {app.start_time.substring(0, 5)} hs</span>
                     <span>Servicio: {app.service_name}</span>
                   </div>
 
                   <div className="alert-actions">
-                    {isTriggered ? (
+                    {actionType === 'confirmed' ? (
                       <button className="action-trigger-btn triggered" disabled>
                         <Check size={14} />
-                        {actionType === 'whatsapp' ? 'WhatsApp Enviado' : 'Turno Confirmado'}
+                        Turno confirmado
                       </button>
+                    ) : actionType === 'whatsapp' ? (
+                      <>
+                        <button className="action-trigger-btn triggered whatsapp" disabled>
+                          <Check size={14} />
+                          WhatsApp enviado
+                        </button>
+                        <button 
+                          className="action-trigger-btn secondary"
+                          onClick={() => handleAction(app.id, app.client_hashed, 'confirm')}
+                        >
+                          <UserCheck size={14} />
+                          Confirmar
+                        </button>
+                      </>
                     ) : (
                       <>
                         <button 

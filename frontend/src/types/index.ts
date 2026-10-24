@@ -35,3 +35,4 @@ export interface Appointment {
   color_code: string;
   diagnostic?: string;
 }
+

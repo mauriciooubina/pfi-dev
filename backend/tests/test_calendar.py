@@ -45,3 +45,45 @@ def test_calendar_service_file_not_found():
             with pytest.raises(HTTPException) as exc_info:
                 get_calendar_data(shop_id="hellfish")
             assert exc_info.value.status_code == 404
+
+def test_simulate_appointment_fiel(client):
+    payload = {
+        "shop_id": "hooligans",
+        "barber_id": 1,
+        "barber_name": "Sebastian Fraga",
+        "service_name": "Corte Clásico",
+        "service_price": 19000.0,
+        "service_duration": 45,
+        "date": "2026-01-21",
+        "start_time": "15:00:00",
+        "lead_time_hours": 2.0,
+        "client_profile": "fiel",
+        "is_self_booked": 0
+    }
+    response = client.post("/api/calendar/simulate", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["ausentismo_risk"] == "BAJO"
+    assert data["color_code"] == "#10b981"
+
+def test_simulate_appointment_riesgo(client):
+    payload = {
+        "shop_id": "hooligans",
+        "barber_id": 5,
+        "barber_name": "Valentin",
+        "service_name": "Corte + Barba",
+        "service_price": 13000.0,
+        "service_duration": 30,
+        "date": "2026-01-21",
+        "start_time": "18:00:00",
+        "lead_time_hours": 72.0,
+        "client_profile": "riesgo",
+        "is_self_booked": 1
+    }
+    response = client.post("/api/calendar/simulate", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["ausentismo_risk"] == "ALTO"
+    assert data["color_code"] == "#ef4444"
+
+

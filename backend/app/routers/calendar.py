@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query
-from app.schemas.calendar import CalendarResponse
-from app.services.calendar_service import get_calendar_data
+from app.schemas.calendar import CalendarResponse, AppointmentResponse, SimulateAppointmentRequest
+from app.services.calendar_service import get_calendar_data, simulate_appointment_service
 
 router = APIRouter(prefix="/api/calendar", tags=["Calendar"])
 
@@ -13,3 +13,11 @@ def get_calendar(
     Devuelve los turnos para un comercio y fecha, evaluando el riesgo de ausentismo en tiempo real.
     """
     return get_calendar_data(shop_id=shop_id, date=date)
+
+@router.post("/simulate", response_model=AppointmentResponse)
+def simulate_appointment(payload: SimulateAppointmentRequest):
+    """
+    Simula en caliente la inyección de un nuevo turno para la defensa en vivo,
+    evaluándolo inmediatamente con el clasificador Gradient Boosting.
+    """
+    return simulate_appointment_service(payload)
